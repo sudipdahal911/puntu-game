@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Puntu Period Punch Game 💥</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Comic Sans MS","Trebuchet MS",system-ui;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,#fff0f6,#ffe6f0);
+    overflow:hidden;transition:background 800ms ease;color:#ff267f;
+  }
+  .container{width:100%;max-width:920px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+  h1{font-size:clamp(20px,3.2vw,36px);color:#ff4da6;text-shadow:0 2px 4px rgba(0,0,0,0.06);text-align:center;}
+  #gameArea{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;min-height:320px;padding-bottom:40px;}
+  #character{
+    width:32vmin;height:32vmin;max-width:220px;max-height:220px;
+    background:url('https://i.postimg.cc/YjwwdWHQ/BF9C56D3-A1DD-484C-A32C-BAF886E6C342-removebg-preview.png') center/cover no-repeat;
+    border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.08);
+    cursor:pointer;transition:transform .12s ease,box-shadow .12s ease;touch-action:manipulation;
+  }
+  #character.punched{transform:scale(.92) rotate(-6deg);box-shadow:0 6px 20px rgba(0,0,0,0.06);}
+  .hud{display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;}
+  .pill{background:rgba(255,255,255,0.9);padding:8px 12px;border-radius:999px;font-weight:600;color:#ff1a7a;box-shadow:0 6px 18px rgba(255,0,150,0.04);}
+  #messageBox{text-align:center;color:#ff356f;font-size:clamp(14px,2.2vw,18px);max-width:720px;line-height:1.35;padding:6px 10px;}
+  .heart{position:absolute;font-size:1.5rem;animation:floatUp 1000ms ease-out forwards;pointer-events:none;}
+  @keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-110px) scale(.8);opacity:0}}
+  .pow{position:absolute;font-size:2rem;animation:powAnim .45s ease-out forwards;pointer-events:none;}
+  @keyframes powAnim{0%{transform:scale(.5);opacity:.9}100%{transform:scale(1.8);opacity:0}}
+  .bouquet{position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:160px;animation:popUp 1.2s ease forwards;}
+  @keyframes popUp{0%{transform:translate(-50%,30px) scale(.8);opacity:0}100%{transform:translate(-50%,0) scale(1);opacity:1}}
+  .levelMessage{position:absolute;top:46%;left:50%;transform:translateX(-50%);font-size:clamp(16px,2.5vw,22px);color:#ff0066;text-shadow:0 2px 6px rgba(255,255,255,0.6);animation:fadeIn .9s ease forwards;}
+  @keyframes fadeIn{from{opacity:0;transform:translateX(-50%) scale(.92)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+  .finalMessage{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);text-align:center;font-size:clamp(16px,2.6vw,20px);background:linear-gradient(90deg,rgba(255,255,255,.9),rgba(255,250,250,.85));padding:10px 16px;border-radius:12px;color:#ff1a7a;box-shadow:0 10px 30px rgba(255,0,150,0.06);}
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:999;background:linear-gradient(180deg,rgba(0,0,0,0.25),rgba(0,0,0,0.12));padding:20px;}
+  .card{background:linear-gradient(180deg,#fff,#fff7fb);border-radius:16px;padding:20px;width:100%;max-width:520px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.12);}
+  .card p{color:#ff4d88;margin:12px 0;font-size:16px;line-height:1.3}
+  .btn{background:#ff4da6;color:white;padding:12px 18px;border-radius:999px;display:inline-block;cursor:pointer;font-weight:700;border:none;font-size:16px;}
+  .controls{display:flex;gap:8px;justify-content:center;margin-top:8px;}
+  .small{background:rgba(255,255,255,0.95);color:#ff3a7e;padding:8px 10px;border-radius:8px;font-weight:700;cursor:pointer;border:1px solid rgba(255,0,120,0.06)}
+  @media (max-width:520px){.card{padding:16px}#character{width:42vmin;height:42vmin;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Puntu Period Punch Game 💥</h1>
+  <div id="gameArea">
+    <div id="character"></div>
+    <div class="hud">
+      <div id="score" class="pill">Score: 0</div>
+      <div id="level" class="pill">Level: 1</div>
+      <button id="muteBtn" class="small">🔈 Mute</button>
+    </div>
+    <div id="messageBox">You're too cute for this game 😚</div>
+  </div>
+</div>
+
+<div id="overlay" class="overlay">
+  <div class="card">
+    <h2>Hi Puntu 🌸</h2>
+    <p>You're stronger than you think and I hope this silly little game makes your period a bit lighter and painfree. Tap Start whenever you're ready. ❤️</p>
+    <div class="controls">
+      <button id="startBtn" class="btn">Start Game</button>
+      <button id="skipMusic" class="small">Start without music</button>
+    </div>
+    <p style="margin-top:10px;font-size:13px;color:#ff7aa0">You can mute/unmute anytime using the button below.</p>
+  </div>
+</div>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="" type="audio/mpeg">
+</audio>
+
+<script>
+const BACKGROUND_MUSIC_URL = "";
+const punchSound = new Audio("https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg");
+const levelSound = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+
+let score=0,level=1,levelGoal=10,combo=0,comboTimeout=null;
+const colors=["#ffe6f0","#ffd9ec","#ffcce6","#ffb3e6","#ff99dd","#ff80cc","#ff66b3","#ff4da6","#ff3399","#ff1a8c"];
+const messages=["You're too cute for this game 😚","You're breaking my heart (in a good way) 💓","Careful, I'm falling harder 😳","Leveling up in love ❤️","You win my heart is yours 💘","Ok stop, I'm blushing now 😳","Punch power: 100% sweetness!","You're officially my weakness 💞","You’re punching your way into my heart 💗","My heart can't take this much cuteness 🥹","Level up! Love energy boosted ⚡","Warning: Too adorable to handle 🐰","Cupid would be jealous 💘","You deserve a medal for sweetness 🏅","Smiles unlocked! 😄","You're love-powered now 💖","Your punches are filled with affection 💫","Wow, you’re unstoppable in love 💞","Almost there, my love champion 🥰","Yay! You made it I’m so proud of you 💐"];
+
+const char=document.getElementById('character');
+const scoreDisplay=document.getElementById('score');
+const levelDisplay=document.getElementById('level');
+const messageBox=document.getElementById('messageBox');
+const overlay=document.getElementById('overlay');
+const startBtn=document.getElementById('startBtn');
+const skipMusic=document.getElementById('skipMusic');
+const muteBtn=document.getElementById('muteBtn');
+const bgMusic=document.getElementById('bgMusic');
+
+if(BACKGROUND_MUSIC_URL){bgMusic.querySelector('source').src=BACKGROUND_MUSIC_URL;bgMusic.load();}
+
+let finalShown=false;
+function playBgMusic(){if(!bgMusic||!bgMusic.src)return;bgMusic.play().catch(()=>{});}
+function stopBgMusic(){if(!bgMusic||!bgMusic.src)return;bgMusic.pause();bgMusic.currentTime=0;}
+
+startBtn.addEventListener('click',()=>{overlay.style.display='none';if(bgMusic.src)playBgMusic();});
+skipMusic.addEventListener('click',()=>{overlay.style.display='none';stopBgMusic();});
+
+muteBtn.addEventListener('click',()=>{if(bgMusic.paused){bgMusic.play();muteBtn.textContent="🔊 Unmute";}else{bgMusic.pause();muteBtn.textContent="🔈 Mute";}});
+
+char.addEventListener('click',()=>{
+  punchSound.currentTime=0;punchSound.play();
+  char.classList.add('punched');setTimeout(()=>char.classList.remove('punched'),120);
+  combo++;clearTimeout(comboTimeout);comboTimeout=setTimeout(()=>combo=0,800);
+  score+=1+Math.floor(combo/3);scoreDisplay.textContent=`Score: ${score}`;
+  const heart=document.createElement('div');heart.className='heart';heart.textContent=['💖','💘','💞','💓','💕'][Math.floor(Math.random()*5)];
+  const r=char.getBoundingClientRect();heart.style.left=(r.left+window.scrollX+r.width*0.45)+'px';heart.style.top=(r.top+window.scrollY+r.height*0.15)+'px';
+  document.body.appendChild(heart);setTimeout(()=>heart.remove(),1000);
+  const pow=document.createElement('div');pow.className='pow';pow.textContent='💥';pow.style.left=(r.left+window.scrollX+r.width*0.45)+'px';pow.style.top=(r.top+window.scrollY+r.height*0.35)+'px';document.body.appendChild(pow);setTimeout(()=>pow.remove(),450);
+  if(score>=level*levelGoal){level++;levelDisplay.textContent=`Level: ${level}`;messageBox.textContent=messages[(level-1)%messages.length];document.body.style.background=`linear-gradient(180deg,${colors[level%colors.length]},#ffe6f0)`;showLevelAnimation();levelSound.currentTime=0;levelSound.play();}
+  if(level===20&&!finalShown){finalShown=true;showFinalMessage();}
+});
+function showLevelAnimation(){const msg=document.createElement('div');msg.className='levelMessage';msg.textContent='Level Up! Keep punching with love 💞';document.body.appendChild(msg);setTimeout(()=>msg.remove(),3000);}
+function showFinalMessage(){const fm=document.createElement('div');fm.className='finalMessage';fm.innerHTML="💐 You’ve unlocked <b>Ultimate Love Mode!</b> 💖<br>Hope your period gets easier — sending you all the comfort and hugs 🤗";document.body.appendChild(fm);}
+</script>
+</body>
+</html>
